@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chrome screen share and WebRTC demo</title>
+
+  <style>
+    h1, h2, h3 {
+      background: rgb(238, 238, 238);
+      border-bottom-width: 1px;
+      display: block;
+      margin-top: 0;
+      padding: .2em;
+      text-align: center;
+    }
+    .left-video {
+      width: 512px; 
+      height: 384px; 
+      border: 1px solid black;
+    }
+    .right-video {
+      width: 512px; 
+      height: 384px; 
+      border: 1px solid black;
+    }
+    .left-section {
+      float: left;
+    }
+    .right-section {
+      float: right;
+    }
+    .buttons-left-section {
+      position: absolute;
+      float: left;
+    }
+    .buttons-right-section {
+      position: absolute;
+      right: 6px;
+    }
+  </style>
+
+</head>
+<body>
+
+  <h1>Chrome screen share using WebRTC\JSEP and node.js + web socket for transport</h1>  
+  <h2>Use Chrome, enable screen capture, connect two browsers, and happy sharing.</h2>
+  <div class="left-section">
+  <h3>Local Screen</h3>
+  <video class="left-video" id="localvideo" autoplay controls></video>
+    <div class="buttons-left-section">
+      <button type="button" onclick="startMedia();">Start media</button>
+      <button type="button" onclick="stopMedia();">Stop media</button>
+    </div>
+  </div>
+  <div class="right-section">
+  <h3>Remote Screen</h3>
+  <video class="right-video" id="remotevideo" autoplay controls></video>
+    <div class="buttons-right-section">
+      <button type="button" onclick="connect();">Connect</button>
+      <button type="button" onclick="disconnect();">Disconnect</button>
+    </div>
+  </div>
+
+  <!-- Replace with your server domain or ip address -->
+  <script src="https://10.148.80.115:443/socket.io/socket.io.js"></script>
+  <script>
+
+  // Replace with your server domain or ip address 
+  var socket = io.connect('https://10.148.80.115:443/');
+
+  var localvid = document.getElementById('localvideo');
+  var remotevid = document.getElementById('remotevideo');
+  var localStream = null;
+  var pc = null;
+  var mediaFlowing = false;
+  var channelReady = false;
+
+  var screen_constraints = {
+      mandatory: {
+          chromeMediaSource: 'screen',
+          maxWidth: screen.width,
+          maxHeight: screen.height,
+          minFrameRate: 1,
+          maxFrameRate: 5 
+      },
+      optional: []
+  };
+  var constraints = {
+      audio: false,
+      video: screen_constraints
+  };
+
+  var offerAnswerConstraints = {
+      optional: [],
+      mandatory: {
+          OfferToReceiveAudio: true,
+          OfferToReceiveVideo: true
+      }
+  };
+
+  function startMedia() {
+    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || window.navigator.mozGetUserMedia || navigator.msGetUserMedia;
+    window.URL = window.URL || window.webkitURL;
+    navigator.getUserMedia(constraints, onstream, onerror);
+  }
+
+  function onstream(stream) {
+    localStream = stream;
+    if (localvid.mozSrcObject) {
+      localvid.mozSrcObject = stream;
+      localvid.play();
+    } else {
+      try {
+        localvid.src = window.URL.createObjectURL(stream);
+        localvid.play();
+      } catch(e) {
+        console.log("Error setting video src: ", e);
+      }
+    }
+  }
+
+  function onerror(e) {
+      if (location.protocol === 'http:') {
+          alert('Please test this WebRTC experiment on HTTPS.');
+      } else {
+          alert('Screen capturing is either denied or not supported. Are you enabled flag: "Enable screen capture support in getUserMedia"?');
+      }
+      console.error(e);
+  }
+
+  // stop local video
+  function stopMedia() {
+    if (localvid.mozSrcObject) {
+      localvid.mozSrcObject.stop();
+      localvid.src = null;
+    } else {
+      localvid.src = ""; 
+      localStream.stop();
+    }   
+  }
+
+  // send SDP over web socket 
+  function setLocalDescAndSendMessage(sessionDescription) {
+    pc.setLocalDescription(sessionDescription);
+    console.log("Sending: SDP");
+    console.log(sessionDescription);
+    socket.json.send(sessionDescription);
+  }
+
+  function onCreateOfferFailed() {
+    console.log("Create Offer failed");
+  }
+
+  // start the connection on button click 
+  function connect() {
+    if (!mediaFlowing && localStream && channelReady) {
+      createPeerConnection();
+      mediaFlowing = true;
+      pc.createOffer(setLocalDescAndSendMessage, onCreateOfferFailed, offerAnswerConstraints);
+    } else {
+      alert("Local stream not running yet - try again.");
+    }
+  }
+
+  // stop the connection on button click 
+  function disconnect() {
+    console.log("disconnect.");    
+    socket.json.send({type: "bye"});
+    stop();
+  }
+
+  function stop() {
+    pc.close();
+    pc = null;
+    remotevid.src = null; 
+    mediaFlowing = false;    
+  }
+
+  // socket: channel connected
+  socket.on('connect', onChannelOpened)
+        .on('message', onWebSocketMessage);
+
+  function onChannelOpened(evt) {
+    console.log('Web Socket channel opened.');
+    channelReady = true;
+  }
+
+  function onCreateAnswerFailed() {
+    console.log("Create Answer failed");
+  }
+
+  // process messages from web socket 
+  function onWebSocketMessage(evt) {
+    if (evt.type === 'offer') {
+      console.log("Received offer...")
+      if (!mediaFlowing) {
+        createPeerConnection();
+        mediaFlowing = true;
+      }
+      console.log('Creating remote session description...' );
+      
+      var RTCSessionDescription = window.mozRTCSessionDescription || window.webkitRTCSessionDescription || window.RTCSessionDescription;
+      pc.setRemoteDescription(new RTCSessionDescription(evt), function() {
+        console.log('Sending answer...');
+        pc.createAnswer(setLocalDescAndSendMessage, onCreateAnswerFailed, offerAnswerConstraints);
+      }, function() {  
+        console.log('Error setting remote description');   
+      });
+
+    } else if (evt.type === 'answer' && mediaFlowing) {
+      console.log('Received answer...');
+      console.log('Setting remote session description...' );
+      var RTCSessionDescription = window.mozRTCSessionDescription || window.webkitRTCSessionDescription || window.RTCSessionDescription;
+      pc.setRemoteDescription(new RTCSessionDescription(evt));
+
+    } else if (evt.type === 'candidate' && mediaFlowing) {
+      console.log('Received ICE candidate...');
+      var candidate = new RTCIceCandidate({sdpMLineIndex:evt.sdpMLineIndex, sdpMid:evt.sdpMid, candidate:evt.candidate});
+      console.log(candidate);
+      pc.addIceCandidate(candidate);
+
+    } else if (evt.type === 'bye' && mediaFlowing) {
+      console.log("Received bye");
+      stop();
+    }
+  }
+
+  function createPeerConnection() {
+    console.log("Creating peer connection");
+    RTCPeerConnection = window.webkitRTCPeerConnection || window.mozRTCPeerConnection;
+    var pc_config = {"iceServers":[]};
+    try {
+      pc = new RTCPeerConnection(pc_config);
+    } catch (e) {
+      console.log("Failed to create PeerConnection, exception: " + e.message);
+    }
+    // send any ice candidates to the other peer
+    pc.onicecandidate = function (evt) {
+      if (event.candidate) {
+        console.log('Sending ICE candidate...');
+        console.log(evt.candidate);
+        socket.json.send({type: "candidate",
+                          sdpMLineIndex: evt.candidate.sdpMLineIndex,
+                          sdpMid: evt.candidate.sdpMid,
+                          candidate: evt.candidate.candidate});
+      } else {
+        console.log("End of candidates.");
+      }
+    };
+    console.log('Adding local stream...');
+    pc.addStream(localStream);
+
+    pc.addEventListener("addstream", onRemoteStreamAdded, false);
+    pc.addEventListener("removestream", onRemoteStreamRemoved, false)
+
+    // when remote adds a stream, hand it on to the local video element
+    function onRemoteStreamAdded(event) {
+      console.log("Added remote stream");
+      remotevid.src = window.URL.createObjectURL(event.stream);
+    }
+
+    // when remote removes a stream, remove it from the local video element
+    function onRemoteStreamRemoved(event) {
+      console.log("Remove remote stream");
+      remotevid.src = "";
+    }
+  }
+  </script>
+</body>
+</html>
