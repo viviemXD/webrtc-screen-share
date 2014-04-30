@@ -29,8 +29,8 @@ Server Steps
 
 Client Steps
 
-- Start Chrome with this option --enable-usermedia-screen-capturing or enable using   
+- Start Chrome with this option --enable-usermedia-screen-capturing   
 -   or enable using  chrome://flags   'Enable screen capture support in getUserMedia()'
-- Point two browsers to  e.g. https://\<your ip address\>:443 
+- Point two browsers to  e.g. https://\<your ip address\>
 - Start media and connect
 
