@@ -55,8 +55,8 @@
   <h3>Remote Screen</h3>
   <video class="right-video" id="remotevideo" autoplay controls></video>
     <div class="buttons-right-section">
-      <button type="button" onclick="connect();">Connect</button>
-      <button type="button" onclick="disconnect();">Disconnect</button>
+      <button type="button" onclick="share();">Share</button>
+      <button type="button" onclick="endShare();">End Share</button>
     </div>
   </div>
 
@@ -80,7 +80,7 @@
           maxWidth: screen.width,
           maxHeight: screen.height,
           minFrameRate: 1,
-          maxFrameRate: 5 
+          maxFrameRate: 5
       },
       optional: []
   };
@@ -93,7 +93,7 @@
       optional: [],
       mandatory: {
           OfferToReceiveAudio: true,
-          OfferToReceiveVideo: true
+          OfferToReceiveVideo: true 
       }
   };
 
@@ -150,8 +150,8 @@
     console.log("Create Offer failed");
   }
 
-  // start the connection on button click 
-  function connect() {
+  // start the share on button click 
+  function share() {
     if (!mediaFlowing && localStream && channelReady) {
       createPeerConnection();
       mediaFlowing = true;
@@ -161,9 +161,9 @@
     }
   }
 
-  // stop the connection on button click 
-  function disconnect() {
-    console.log("disconnect.");    
+  // stop the share on button click 
+  function endShare() {
+    console.log("end share");    
     socket.json.send({type: "bye"});
     stop();
   }
