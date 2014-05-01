@@ -20,9 +20,9 @@ Server Steps
 
 - Generate keys unless you have real ones
   - place these keys in same folder as app.js
-  - openssl genrsa -out webrtcwwsocket-key.pem 1024
-  - openssl req -new -key webrtcwwsocket-key.pem -out webrtcwwsocket-csr.pem
-  - openssl x509 -req -in webrtcwwsocket-csr.pem -signkey webrtcwwsocket-key.pem -out webrtcwwsocket-cert.pem
+  -  openssl genrsa -out webrtcwwsocket-key.pem 1024
+  -  openssl req -new -key webrtcwwsocket-key.pem -out webrtcwwsocket-csr.pem
+  -  openssl x509 -req -in webrtcwwsocket-csr.pem -signkey webrtcwwsocket-key.pem -out webrtcwwsocket-cert.pem
 - run   'sudo node app.js'
 - You may get errors, if you do then reinstall socket.io in that folder, e.g. 'sudo npm install socket.io'
 
