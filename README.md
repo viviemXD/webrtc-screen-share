@@ -1,6 +1,7 @@
 webrtc-screen-share    
 ===================
 
+
 Test page for Chrome screen share feature, using WebRTC\JSEP and node.js web socket for transport.
 
 - Uses node.js and socket.io
@@ -8,12 +9,12 @@ Test page for Chrome screen share feature, using WebRTC\JSEP and node.js web soc
 - No need for a Web Server
 
 
-Prerequesites
+####  Prerequesites
 
 - Install Node.js  and  socket.io
 
 
-Server Steps 
+####  Server Steps 
 
 - clone this repo to your machine, does not need to be to a web server
 - Edit index.html (insert your web server addres in two places)
@@ -26,7 +27,7 @@ Server Steps
 - You may get errors, if you do then reinstall socket.io in that folder, e.g. 'sudo npm install socket.io'
 
 
-Client Steps
+####  Client Steps
 
 - Open `chrome://flags` in a recent chrome
 - Enable flag `Enable screen capture support in getUserMedia()` 
