@@ -37,3 +37,30 @@ Test page for Chrome screen capture feature, using WebRTC\JSEP and node.js web s
 - Point two browsers to  e.g. https://\<your ip address\>
 - Start media and share
 
+
+#### screen capture with getUserMedia API
+```javascript
+
+  var screen_constraints = {
+      mandatory: {
+          chromeMediaSource: 'screen',
+          maxWidth: screen.width,
+          maxHeight: screen.height,
+          minFrameRate: 1,
+          maxFrameRate: 5
+      },
+      optional: []
+  };
+  var constraints = {
+      audio: false,
+      video: screen_constraints
+  };
+
+
+  function startMedia() {
+    navigator.getUserMedia(constraints, onstream, onerror);
+  }
+
+```
+
+
