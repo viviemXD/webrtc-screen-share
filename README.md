@@ -24,11 +24,11 @@ Test page for Chrome screen capture feature, using WebRTC\JSEP and node.js web s
       },
       optional: []
   };
+  
   var constraints = {
       audio: false,
       video: screen_constraints
   };
-
 
   function startMedia() {
     navigator.getUserMedia(constraints, onstream, onerror);
