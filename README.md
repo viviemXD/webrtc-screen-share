@@ -6,7 +6,7 @@ Test page for Chrome screen capture feature, using WebRTC\JSEP and node.js web s
 
 - Uses node.js and socket.io
 - Only works using Google Chrome  (chromeMediaSource)
-- No need for a Web Server
+- No need for a Web Server, uses node.js instead
 - Tab capture not supported in this demo
 
 
