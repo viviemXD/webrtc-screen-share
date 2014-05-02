@@ -36,9 +36,7 @@ Test page for Chrome screen capture feature, using WebRTC\JSEP and node.js web s
 
 ```
 
-
-
-####  Prerequesites
+####  Setup prerequesites
 
 - Install Node.js  and  socket.io (npm install socket.io)
 
@@ -46,7 +44,7 @@ Test page for Chrome screen capture feature, using WebRTC\JSEP and node.js web s
 ####  Server Steps (Works on Linux and MacOS so far)
 
 - clone this repo to your machine, does not need to be to a web server
-- Edit index.html (insert your web server addres in two places)
+- Edit index.html (insert this machines ip addres in two places)
 
 - Generate keys unless you have real ones, run these commands in the same folder as app.js
   -  openssl genrsa -out webrtcwwsocket-key.pem 1024
@@ -64,7 +62,4 @@ Test page for Chrome screen capture feature, using WebRTC\JSEP and node.js web s
 - Restart browser
 - Point two browsers to  e.g. https://\<your ip address\>
 - Start media and share
-
-
-
 
