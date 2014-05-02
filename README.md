@@ -10,7 +10,7 @@ Test page for Chrome screen capture feature, using WebRTC\JSEP and node.js web s
 - Tab capture not supported in this demo
 
 
-#### screen capture with getUserMedia API
+#### screen capture uses getUserMedia API
 
 ```javascript
 
