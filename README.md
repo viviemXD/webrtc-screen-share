@@ -10,6 +10,34 @@ Test page for Chrome screen capture feature, using WebRTC\JSEP and node.js web s
 - Tab capture not supported in this demo
 
 
+#### screen capture with getUserMedia API
+
+```javascript
+
+  var screen_constraints = {
+      mandatory: {
+          chromeMediaSource: 'screen',
+          maxWidth: screen.width,
+          maxHeight: screen.height,
+          minFrameRate: 1,
+          maxFrameRate: 5
+      },
+      optional: []
+  };
+  var constraints = {
+      audio: false,
+      video: screen_constraints
+  };
+
+
+  function startMedia() {
+    navigator.getUserMedia(constraints, onstream, onerror);
+  }
+
+```
+
+
+
 ####  Prerequesites
 
 - Install Node.js  and  socket.io (npm install socket.io)
@@ -38,29 +66,5 @@ Test page for Chrome screen capture feature, using WebRTC\JSEP and node.js web s
 - Start media and share
 
 
-#### screen capture with getUserMedia API
-```javascript
-
-  var screen_constraints = {
-      mandatory: {
-          chromeMediaSource: 'screen',
-          maxWidth: screen.width,
-          maxHeight: screen.height,
-          minFrameRate: 1,
-          maxFrameRate: 5
-      },
-      optional: []
-  };
-  var constraints = {
-      audio: false,
-      video: screen_constraints
-  };
-
-
-  function startMedia() {
-    navigator.getUserMedia(constraints, onstream, onerror);
-  }
-
-```
 
 
