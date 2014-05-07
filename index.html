@@ -61,11 +61,11 @@
   </div>
 
   <!-- Replace with your server domain or ip address -->
-  <script src="https://10.148.80.115:443/socket.io/socket.io.js"></script>
+  <script src="https://10.148.80.69:443/socket.io/socket.io.js"></script>
   <script>
 
   // Replace with your server domain or ip address 
-  var socket = io.connect('https://10.148.80.115:443/');
+  var socket = io.connect('https://10.148.80.69:443/');
 
   var localvid = document.getElementById('localvideo');
   var remotevid = document.getElementById('remotevideo');
@@ -74,6 +74,17 @@
   var mediaFlowing = false;
   var channelReady = false;
 
+  // Use these screen_constraints if you are using a H264 build of chromoium 
+  /*
+  var screen_constraints = {
+      mandatory: {
+          chromeMediaSource: 'screen'
+      },
+      optional: []
+  };
+  */
+
+  // Otherwise use these
   var screen_constraints = {
       mandatory: {
           chromeMediaSource: 'screen',
@@ -84,6 +95,7 @@
       },
       optional: []
   };
+
   var constraints = {
       audio: false,
       video: screen_constraints
