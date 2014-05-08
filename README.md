@@ -2,10 +2,10 @@ webrtc-screen-share
 ===================
 
 
-Test page for Chrome screen capture feature, using WebRTC\JSEP and node.js web socket for transport.
+Test page for Chrome screen capture feature, using WebRTC/JSEP and node.js web socket for transport.
 
 - Uses node.js and socket.io
-- Only works using Google Chrome  (chromeMediaSource)
+- Only works using Google Chrome, Chromium and Canary
 - No need for a Web Server, uses node.js instead
 - Tab capture not supported in this demo
 
