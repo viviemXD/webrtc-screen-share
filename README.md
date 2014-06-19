@@ -63,3 +63,9 @@ Test page for Chrome screen capture feature, using WebRTC/JSEP and node.js web s
 - Point two browsers to  e.g. https://\<your ip address\>
 - Start media and share
 
+
+NOTE: Google intend on using chrome extensions for desktop share for security reasons.  The way of doing share in this demo is for testing purposes only, that is why it is behind a flag.
+See this demo of share in an extension: 
+https://github.com/emannion/webrtc-application-screen-share
+
+
