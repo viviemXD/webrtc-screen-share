@@ -2,12 +2,12 @@ webrtc-screen-share
 ===================
 
 
-Test page for Chrome screen capture feature, using WebRTC/JSEP and node.js web socket for transport. A very quick way for you to see how screen capture using webrtc works.
+Test page for screen capture feature, using WebRTC/JSEP and node.js web socket for transport. A very quick way for you to see how screen capture using webrtc works. Works for chrome and Firefox nightly.
 
 - Uses node.js and socket.io
-- Only works using Google Chrome, Chromium and Canary
+- Only works using Google Chrome, Chromium and Canary and Firefox nightly
 - No need for a Web Server, uses node.js instead
-- Tab capture not supported in this demo
+- Tab capture or application share not supported in this demo
 
 
 #### screen capture uses getUserMedia API
@@ -57,8 +57,9 @@ Test page for Chrome screen capture feature, using WebRTC/JSEP and node.js web s
 
 ####  Client Steps
 
-- Open `chrome://flags` in a recent chrome
-- Enable flag `Enable screen capture support in getUserMedia()` 
+- (Only for Chrome) Open `chrome://flags` in a recent chrome
+- (Only for Chrome) Enable flag `Enable screen capture support in getUserMedia()` 
+- (Only for Firefox) open about:config create  media.getusermedia.screensharing.enabled and set to true
 - Restart browser
 - Point two browsers to  e.g. https://\<your ip address\>
 - Start media and share

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Chrome screen share and WebRTC demo</title>
+  <title>WebRTC screen share demo</title>
 
   <style>
     h1, h2, h3 {
@@ -41,8 +41,8 @@
 </head>
 <body>
 
-  <h1>Chrome screen share using WebRTC\JSEP and node.js + web socket for transport</h1>  
-  <h2>Use Chrome, enable screen capture, connect two browsers, and happy sharing.</h2>
+  <h1>Screen share using WebRTC\JSEP and node.js + web socket for transport</h1>  
+  <h2>Use Chrome or Firefox(nightly), enable screen capture, connect two browsers, and happy sharing.</h2>
   <div class="left-section">
   <h3>Local Screen</h3>
   <video class="left-video" id="localvideo" autoplay controls></video>
@@ -61,45 +61,48 @@
   </div>
 
   <!-- Replace with your server domain or ip address -->
-  <script src="https://10.148.80.69:443/socket.io/socket.io.js"></script>
   <script>
 
   // Replace with your server domain or ip address 
-  var socket = io.connect('https://10.148.80.69:443/');
+  var socket = new WebSocket('wss://10.148.81.29:443/');
 
   var localvid = document.getElementById('localvideo');
   var remotevid = document.getElementById('remotevideo');
   var localStream = null;
   var pc = null;
   var mediaFlowing = false;
-  var channelReady = false;
 
-  // Use these screen_constraints if you are using a H264 build of chromoium 
-  /*
-  var screen_constraints = {
-      mandatory: {
-          chromeMediaSource: 'screen'
-      },
-      optional: []
-  };
-  */
+  // Detect browser
+  var userAgent = navigator.userAgent.toLowerCase();
+  var browserM = userAgent.match(/(opera|chrome|safari|firefox|msie)[\/\s]*([\d\.]+)/);
+  var browser = navigator.appName.toLowerCase();
+  if(browserM)
+    browser = browserM[1];
+    var isChrome = (browser === "chrome");
+    var isFirefox = (browser === "firefox");
 
-  // Otherwise use these
-  var screen_constraints = {
-      mandatory: {
+  var screen_constraints = null;
+
+  if(isChrome) {  
+    screen_constraints = {
+      video: {
+        mandatory: {
           chromeMediaSource: 'screen',
           maxWidth: screen.width,
           maxHeight: screen.height,
           minFrameRate: 1,
           maxFrameRate: 5
-      },
-      optional: []
-  };
-
-  var constraints = {
-      audio: false,
-      video: screen_constraints
-  };
+        },
+        optional: []
+    }};
+  } else {
+    screen_constraints = {
+      video: {
+        mozMediaSource: "screen",
+        mediaSource: "screen"
+      }
+    };
+  }
 
   var offerAnswerConstraints = {
       optional: [],
@@ -112,7 +115,7 @@
   function startMedia() {
     navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || window.navigator.mozGetUserMedia || navigator.msGetUserMedia;
     window.URL = window.URL || window.webkitURL;
-    navigator.getUserMedia(constraints, onstream, onerror);
+    navigator.getUserMedia(screen_constraints, onstream, onerror);
   }
 
   function onstream(stream) {
@@ -151,11 +154,27 @@
   }
 
   // send SDP over web socket 
-  function setLocalDescAndSendMessage(sessionDescription) {
+  function setLocalDescAndSendMessageOffer(sessionDescription) {
     pc.setLocalDescription(sessionDescription);
     console.log("Sending: SDP");
     console.log(sessionDescription);
-    socket.json.send(sessionDescription);
+    socket.send(JSON.stringify({
+                    "messageType": "offer",
+                    "peerDescription": sessionDescription
+               }));
+
+  }
+
+  // send SDP over web socket 
+  function setLocalDescAndSendMessageAnswer(sessionDescription) {
+    pc.setLocalDescription(sessionDescription);
+    console.log("Sending: SDP");
+    console.log(sessionDescription);
+
+    socket.send(JSON.stringify({
+                    "messageType": "answer",
+                    "peerDescription": sessionDescription
+               }));
   }
 
   function onCreateOfferFailed() {
@@ -164,10 +183,10 @@
 
   // start the share on button click 
   function share() {
-    if (!mediaFlowing && localStream && channelReady) {
+    if (!mediaFlowing && localStream) {
       createPeerConnection();
       mediaFlowing = true;
-      pc.createOffer(setLocalDescAndSendMessage, onCreateOfferFailed, offerAnswerConstraints);
+      pc.createOffer(setLocalDescAndSendMessageOffer, onCreateOfferFailed, offerAnswerConstraints);
     } else {
       alert("Local stream not running yet - try again.");
     }
@@ -176,61 +195,60 @@
   // stop the share on button click 
   function endShare() {
     console.log("end share");    
-    socket.json.send({type: "bye"});
+    socket.send(JSON.stringify({type: "bye"}));
     stop();
   }
 
   function stop() {
-    pc.close();
+    if (pc) {
+      pc.close();
+    }
     pc = null;
     remotevid.src = null; 
     mediaFlowing = false;    
-  }
-
-  // socket: channel connected
-  socket.on('connect', onChannelOpened)
-        .on('message', onWebSocketMessage);
-
-  function onChannelOpened(evt) {
-    console.log('Web Socket channel opened.');
-    channelReady = true;
   }
 
   function onCreateAnswerFailed() {
     console.log("Create Answer failed");
   }
 
+ socket.addEventListener("message", onWebSocketMessage, false);
+
   // process messages from web socket 
   function onWebSocketMessage(evt) {
-    if (evt.type === 'offer') {
+    var message = JSON.parse(evt.data);
+    if (message.messageType === 'offer') {
       console.log("Received offer...")
       if (!mediaFlowing) {
         createPeerConnection();
         mediaFlowing = true;
       }
       console.log('Creating remote session description...' );
-      
+     
+      var remoteDescription = message.peerDescription; 
       var RTCSessionDescription = window.mozRTCSessionDescription || window.webkitRTCSessionDescription || window.RTCSessionDescription;
-      pc.setRemoteDescription(new RTCSessionDescription(evt), function() {
+      pc.setRemoteDescription(new RTCSessionDescription(remoteDescription), function() {
         console.log('Sending answer...');
-        pc.createAnswer(setLocalDescAndSendMessage, onCreateAnswerFailed, offerAnswerConstraints);
+        pc.createAnswer(setLocalDescAndSendMessageAnswer, onCreateAnswerFailed, offerAnswerConstraints);
       }, function() {  
         console.log('Error setting remote description');   
       });
 
-    } else if (evt.type === 'answer' && mediaFlowing) {
+    } else if (message.messageType === 'answer' && mediaFlowing) {
       console.log('Received answer...');
       console.log('Setting remote session description...' );
+      var remoteDescription = message.peerDescription;
       var RTCSessionDescription = window.mozRTCSessionDescription || window.webkitRTCSessionDescription || window.RTCSessionDescription;
-      pc.setRemoteDescription(new RTCSessionDescription(evt));
+      pc.setRemoteDescription(new RTCSessionDescription(remoteDescription));
 
-    } else if (evt.type === 'candidate' && mediaFlowing) {
+    } else if (message.messageType === 'iceCandidate' && mediaFlowing) {
       console.log('Received ICE candidate...');
-      var candidate = new RTCIceCandidate({sdpMLineIndex:evt.sdpMLineIndex, sdpMid:evt.sdpMid, candidate:evt.candidate});
+      var RTCIceCandidate = window.mozRTCIceCandidate || window.webkitRTCIceCandidate || window.RTCIceCandidate;
+      var candidate = new RTCIceCandidate({sdpMLineIndex:message.candidate.sdpMLineIndex, sdpMid:message.candidate.sdpMid, candidate:message.candidate.candidate});
       console.log(candidate);
       pc.addIceCandidate(candidate);
 
-    } else if (evt.type === 'bye' && mediaFlowing) {
+    } else if (message.type === 'bye' && mediaFlowing) {
       console.log("Received bye");
       stop();
     }
@@ -247,13 +265,15 @@
     }
     // send any ice candidates to the other peer
     pc.onicecandidate = function (evt) {
-      if (event.candidate) {
+      if (evt.candidate) {
         console.log('Sending ICE candidate...');
         console.log(evt.candidate);
-        socket.json.send({type: "candidate",
-                          sdpMLineIndex: evt.candidate.sdpMLineIndex,
-                          sdpMid: evt.candidate.sdpMid,
-                          candidate: evt.candidate.candidate});
+
+        socket.send(JSON.stringify({
+                     "messageType": "iceCandidate",
+                     "candidate": evt.candidate 
+                    }));   
+
       } else {
         console.log("End of candidates.");
       }
@@ -268,6 +288,7 @@
     function onRemoteStreamAdded(event) {
       console.log("Added remote stream");
       remotevid.src = window.URL.createObjectURL(event.stream);
+      pc.createAnswer(setLocalDescAndSendMessageAnswer, onCreateAnswerFailed, offerAnswerConstraints);
     }
 
     // when remote removes a stream, remove it from the local video element
