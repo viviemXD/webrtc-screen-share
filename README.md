@@ -6,7 +6,7 @@ Test page for screen capture feature, using WebRTC/JSEP and node.js web socket f
 
 - Uses node.js and socket.io
 - Only works using Google Chrome, Chromium and Canary and Firefox nightly
-- No need for a Web Server, uses node.js instead
+- No need for a Web Server, uses node.js as your server
 - Tab capture or application share not supported in this demo
 
 
@@ -58,7 +58,7 @@ Test page for screen capture feature, using WebRTC/JSEP and node.js web socket f
   -  openssl x509 -req -in webrtcwwsocket-csr.pem -signkey webrtcwwsocket-key.pem -out webrtcwwsocket-cert.pem
   
 - run   'sudo node app.js'
-- You may get errors, if you do then reinstall socket.io in that folder, e.g. 'sudo npm install socket.io'
+- You may get errors, if you do then reinstall socket.io in that folder, e.g. 'sudo npm install websocket'
 
 
 ####  Client Steps
