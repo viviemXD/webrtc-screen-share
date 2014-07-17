@@ -14,21 +14,27 @@ Test page for screen capture feature, using WebRTC/JSEP and node.js web socket f
 
 ```javascript
 
-  var screen_constraints = {
-      mandatory: {
+  if(isChrome) {   
+    constraints = { 
+      video: {
+        mandatory: {
           chromeMediaSource: 'screen',
           maxWidth: screen.width,
           maxHeight: screen.height,
           minFrameRate: 1,
           maxFrameRate: 5
-      },
-      optional: []
-  };
-  
-  var constraints = {
-      audio: false,
-      video: screen_constraints
-  };
+        },  
+        optional: []
+    }}; 
+  } else {
+    constraints = { 
+      video: {
+        mozMediaSource: "screen",
+        mediaSource: "screen"
+      }   
+    };  
+  }
+
 
   function startMedia() {
     navigator.getUserMedia(constraints, onstream, onerror);
