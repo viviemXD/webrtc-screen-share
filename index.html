@@ -188,7 +188,7 @@
       mediaFlowing = true;
       pc.createOffer(setLocalDescAndSendMessageOffer, onCreateOfferFailed, offerAnswerConstraints);
     } else {
-      alert("Local stream not running yet - try again.");
+      alert("Local stream not running yet or media still flowing");
     }
   }
 
