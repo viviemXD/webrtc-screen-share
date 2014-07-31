@@ -98,7 +98,6 @@
   } else {
     screen_constraints = {
       video: {
-        mozMediaSource: "screen",
         mediaSource: "screen"
       }
     };
@@ -137,7 +136,7 @@
       if (location.protocol === 'http:') {
           alert('Please test this WebRTC experiment on HTTPS.');
       } else {
-          alert('Screen capturing is either denied or not supported. Are you enabled flag: "Enable screen capture support in getUserMedia"?');
+          alert('Screen capturing is either denied or not supported. Have you enabled the appropriate flag? see README.md');
       }
       console.error(e);
   }
