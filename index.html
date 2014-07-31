@@ -42,13 +42,17 @@
 <body>
 
   <h1>Screen share using WebRTC\JSEP and node.js + web socket for transport</h1>  
-  <h2>Use Chrome or Firefox(nightly), enable screen capture, connect two browsers, and happy sharing.</h2>
+  <h2>Use Chrome or Firefox(nightly), enable flag, connect two browsers. <br> Firefox allows screen and window share, Chrome only alows screen share when not an extension.</h2>
   <div class="left-section">
   <h3>Local Screen</h3>
   <video class="left-video" id="localvideo" autoplay controls></video>
     <div class="buttons-left-section">
       <button type="button" onclick="startMedia();">Start media</button>
       <button type="button" onclick="stopMedia();">Stop media</button>
+      <select id="selector" onchange="selectChanged()" disabled>
+        <option value="screen">Screen</option>
+        <option value="window">Window</option>
+      </select> 
     </div>
   </div>
   <div class="right-section">
@@ -68,6 +72,7 @@
 
   var localvid = document.getElementById('localvideo');
   var remotevid = document.getElementById('remotevideo');
+  var shareSelector = document.getElementById('selector');
   var localStream = null;
   var pc = null;
   var mediaFlowing = false;
@@ -96,6 +101,7 @@
         optional: []
     }};
   } else {
+    selector.disabled = false; 
     screen_constraints = {
       video: {
         mediaSource: "screen"
@@ -111,6 +117,24 @@
       }
   };
 
+  function selectChanged() {
+    var value = shareSelector.options[shareSelector.selectedIndex].value;
+
+    if (value == "window") {
+      screen_constraints = { 
+        video: {
+          mediaSource: "window"
+        }   
+      };
+    } else { 
+      screen_constraints = { 
+        video: {
+          mediaSource: "screen"
+        }   
+      };
+    }
+  }
+ 
   function startMedia() {
     navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || window.navigator.mozGetUserMedia || navigator.msGetUserMedia;
     window.URL = window.URL || window.webkitURL;
