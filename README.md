@@ -4,7 +4,7 @@ webrtc-screen-share
 
 Test page for screen capture feature, using WebRTC/JSEP and node.js web socket for transport. A very quick way for you to see how screen capture using webrtc works. Works for chrome and Firefox nightly.
 
-- Uses node.js and socket.io
+- Uses node.js and websocket
 - Only works using Google Chrome, Chromium and Canary and Firefox nightly
 - No need for a Web Server, uses node.js as your server
 - Tab capture or application share not supported in this demo
