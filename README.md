@@ -44,13 +44,12 @@ Test page for screen capture feature, using WebRTC/JSEP and node.js web socket f
 
 ####  Setup prerequesites
 
-- Install Node.js  and  socket.io (npm install socket.io)
+- Install Node.js  and  WebSocket(sudo npm install websocket)
 
 
 ####  Server Steps (Works on Linux and MacOS so far)
 
 - clone this repo to your machine, does not need to be to a web server
-- Edit index.html (insert this machines ip addres in two places)
 
 - Generate keys unless you have real ones, run these commands in the same folder as app.js
   -  openssl genrsa -out webrtcwwsocket-key.pem 1024
@@ -58,14 +57,14 @@ Test page for screen capture feature, using WebRTC/JSEP and node.js web socket f
   -  openssl x509 -req -in webrtcwwsocket-csr.pem -signkey webrtcwwsocket-key.pem -out webrtcwwsocket-cert.pem
   
 - run   'sudo node app.js'
-- You may get errors, if you do then reinstall socket.io in that folder, e.g. 'sudo npm install websocket'
+- You may get errors, if you do then reinstall WebSocket in that folder, e.g. 'sudo npm install websocket'
 
 
 ####  Client Steps
 
-- (Only for Chrome) Open `chrome://flags` in a recent chrome
-- (Only for Chrome) Enable flag `Enable screen capture support in getUserMedia()` 
+- (Only for Chrome) start chrome browser with flag   --enable-usermedia-screen-capture 
 - (Only for Firefox) open about:config create  media.getusermedia.screensharing.enabled and set to true
+- (Only for Firefox) open about:config in media.getusermedia.screensharing.allowed_domains append the IP address of your node server e.g. "102.160.1.2"
 - Restart browser
 - Point two browsers to  e.g. https://\<your ip address\>
 - Start media and share

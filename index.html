@@ -67,8 +67,10 @@
   <!-- Replace with your server domain or ip address -->
   <script>
 
-  // Replace with your server domain or ip address 
-  var socket = new WebSocket('wss://10.148.81.29:443/');
+  // detect server from URL
+  var hostArray = window.location.host.split(':');
+  var serverLoc = 'wss://' + hostArray[0] + ':443/'
+  var socket = new WebSocket(serverLoc);
 
   var localvid = document.getElementById('localvideo');
   var remotevid = document.getElementById('remotevideo');
