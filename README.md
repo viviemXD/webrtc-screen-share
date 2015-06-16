@@ -1,11 +1,11 @@
 webrtc-screen-share    
 ===================
 
-Test page for screen capture feature, using WebRTC/JSEP and node.js web socket for transport. A very quick way for you to see how screen capture using webrtc works. Works for chrome, Firefox nightly and Firefox Aurora.
+Test page for screen capture feature, using WebRTC/JSEP and node.js web socket for transport. A very quick way for you to see how screen capture using webrtc works. This demo supports both Chrome and Firefox.
 
 - Uses node.js and websocket
-- Only works using Google Chrome, Chromium and Canary, Firefox nightly and Firefox Aurora.
-- Chrome can do screen share only in this demo.
+- Only works using Google Chrome, Firefox. 
+- Chrome can do screen share only in this demo. (must start Chrome on command line using --enable-usermedia-screen-capturing)
 - Firefox can do both screen share and window share.
 - No need for a Web Server, uses node.js as your server
 - Tab capture or application share not supported in this demo
