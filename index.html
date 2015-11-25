@@ -82,14 +82,14 @@
   var userAgent = navigator.userAgent.toLowerCase();
   var browserM = userAgent.match(/(opera|chrome|safari|firefox|msie)[\/\s]*([\d\.]+)/);
   var browser = navigator.appName.toLowerCase();
-  if(browserM)
+  if (browserM)
     browser = browserM[1];
     var isChrome = (browser === "chrome");
     var isFirefox = (browser === "firefox");
 
   var screen_constraints = null;
 
-  if(isChrome) {  
+  if (isChrome) {  
     screen_constraints = {
       video: {
         mandatory: {
