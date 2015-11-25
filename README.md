@@ -65,7 +65,9 @@ Test page for screen capture feature, using WebRTC/JSEP and node.js web socket f
 - (Only for Chrome) start chrome browser with flag   --enable-usermedia-screen-capture 
 - (Only for Firefox) open about:config create  media.getusermedia.screensharing.enabled and set to true
 - (Only for Firefox) open about:config in media.getusermedia.screensharing.allowed_domains append the IP address of your node server e.g. "192.168.1.2"
-- Point two browsers to  e.g. https://\<your ip address\>
+- Point two browsers to, e.g. https://\<your ip address\>
+  - Or point two tabs on same browser to, e.g. https://\<your ip address\>
+  - To start two instances of Firefox on the same machine run: firefox --profilemanager
 - Accept any local unsecure certificate dialogues that appear on either browser.
 - Start media and share
 
