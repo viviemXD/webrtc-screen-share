@@ -9,6 +9,7 @@ Test page for screen capture feature, using WebRTC and node.js web socket for tr
 - Firefox can do both screen share and window share.
 - No need for a Web Server, uses node.js as your server
 - Tab capture or application share not supported in this demo
+- Supports Secure HTTP and secure websocket wss
 
 
 #### screen capture uses getUserMedia API
@@ -35,7 +36,6 @@ Test page for screen capture feature, using WebRTC and node.js web socket for tr
     };  
   }
 
-
   function startMedia() {
     navigator.getUserMedia(constraints, onstream, onerror);
   }
@@ -49,14 +49,14 @@ Test page for screen capture feature, using WebRTC and node.js web socket for tr
 
 ####  Server Steps (Works on Linux and MacOS so far)
 
-- clone this repo to your machine, does not need to be to a web server
+- Clone this repo to your machine, does not need to be to a web server
 
 - Generate keys unless you have real ones, run these commands in the same folder as app.js
   -  openssl genrsa -out webrtcwwsocket-key.pem 1024
   -  openssl req -new -key webrtcwwsocket-key.pem -out webrtcwwsocket-csr.pem
   -  openssl x509 -req -in webrtcwwsocket-csr.pem -signkey webrtcwwsocket-key.pem -out webrtcwwsocket-cert.pem
   
-- run  'sudo node app.js'
+- Run  'sudo node app.js'
 - You may get errors, if you do then reinstall WebSocket in that folder, e.g. 'sudo npm install websocket'
 
 
