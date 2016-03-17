@@ -1,7 +1,7 @@
 webrtc-screen-share    
 ===================
 
-Test page for screen capture feature, using WebRTC/JSEP and node.js web socket for transport. A very quick way for you to see how screen capture using webrtc works. This demo supports both Chrome and Firefox.
+Test page for screen capture feature, using WebRTC and node.js web socket for transport. A very quick way for you to see how screen capture using webrtc works. This demo supports both Chrome and Firefox.
 
 - Uses node.js and websocket
 - Only works using Google Chrome, Firefox. 
@@ -56,13 +56,13 @@ Test page for screen capture feature, using WebRTC/JSEP and node.js web socket f
   -  openssl req -new -key webrtcwwsocket-key.pem -out webrtcwwsocket-csr.pem
   -  openssl x509 -req -in webrtcwwsocket-csr.pem -signkey webrtcwwsocket-key.pem -out webrtcwwsocket-cert.pem
   
-- run   'sudo node app.js'
+- run  'sudo node app.js'
 - You may get errors, if you do then reinstall WebSocket in that folder, e.g. 'sudo npm install websocket'
 
 
 ####  Client Steps
 
-- (Only for Chrome) start chrome browser with flag   --enable-usermedia-screen-capture 
+- (Only for Chrome) start chrome browser with flag --enable-usermedia-screen-capturing
 - (Only for Firefox) open about:config create  media.getusermedia.screensharing.enabled and set to true
 - (Only for Firefox) open about:config in media.getusermedia.screensharing.allowed_domains append the IP address of your node server e.g. "192.168.1.2"
 - Point two browsers to, e.g. https://\<your ip address\>
@@ -76,4 +76,4 @@ NOTE: Google intend on using chrome extensions for desktop share for security re
 See this demo of share in an extension: 
 https://github.com/emannion/webrtc-application-screen-share
 
-
+NOTE: Firefox also recommends using an extension for screenshare, two advantages being not requiring the two config items mentioned in the client steps above.

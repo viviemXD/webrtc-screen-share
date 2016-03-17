@@ -137,33 +137,73 @@
   }
  
   function startMedia() {
-    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || window.navigator.mozGetUserMedia || navigator.msGetUserMedia;
-    window.URL = window.URL || window.webkitURL;
-    navigator.getUserMedia(screen_constraints, onstream, onerror);
-  }
+    var promisifiedOldGUM = function(constraints, successCallback, errorCallback) {
 
-  function onstream(stream) {
-    localStream = stream;
-    if (localvid.mozSrcObject) {
-      localvid.mozSrcObject = stream;
-      localvid.play();
-    } else {
-      try {
-        localvid.src = window.URL.createObjectURL(stream);
-        localvid.play();
-      } catch(e) {
-        console.log("Error setting video src: ", e);
+      // First get ahold of getUserMedia, if present
+      var getUserMedia = (navigator.getUserMedia ||
+                          navigator.webkitGetUserMedia ||
+                          navigator.mozGetUserMedia);
+
+      // Some browsers just don't implement it - return a rejected promise with an error
+      // to keep a consistent interface
+      if(!getUserMedia) {
+        return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
       }
+
+      // Otherwise, wrap the call to the old navigator.getUserMedia with a Promise
+      return new Promise(function(successCallback, errorCallback) {
+        getUserMedia.call(navigator, constraints, successCallback, errorCallback);
+      });
     }
+
+    // Older browsers might not implement mediaDevices at all, so we set an empty object first
+    if(navigator.mediaDevices === undefined) {
+      navigator.mediaDevices = {};
+    }
+
+    // Some browsers partially implement mediaDevices. We can't just assign an object
+    // with getUserMedia as it would overwrite existing properties.
+    // Here, we will just add the getUserMedia property if it's missing.
+    if(navigator.mediaDevices.getUserMedia === undefined) {
+      navigator.mediaDevices.getUserMedia = promisifiedOldGUM;
+    }
+
+    // Prefer camera resolution nearest to 1280x720.
+    //var constraints = { audio: true, video: { width: 1280, height: 720 } };
+
+    navigator.mediaDevices.getUserMedia(screen_constraints)
+      .then(function(stream) {
+        localStream = stream;
+        if (localvid.mozSrcObject) {
+          localvid.mozSrcObject = stream;
+          localvid.play();
+        } else {
+          try {
+            localvid.src = window.URL.createObjectURL(stream);
+            localvid.play();
+          } catch(e) {
+            console.log("Error setting video src: ", e);
+          }
+        }
+      })
+      .catch(function(err) {
+        console.log(err.name + ": " + err.message);
+        if (location.protocol === 'http:') {
+          alert('Please test this WebRTC experiment on HTTPS.');
+        } else {
+          alert('Screen capturing is either denied or not supported. Have you enabled the appropriate flag? see README.md');
+        }
+        console.error(e);
+    });
   }
 
   function onerror(e) {
-      if (location.protocol === 'http:') {
-          alert('Please test this WebRTC experiment on HTTPS.');
-      } else {
-          alert('Screen capturing is either denied or not supported. Have you enabled the appropriate flag? see README.md');
-      }
-      console.error(e);
+    if (location.protocol === 'http:') {
+        alert('Please test this WebRTC experiment on HTTPS.');
+    } else {
+        alert('Screen capturing is either denied or not supported. Have you enabled the appropriate flag? see README.md');
+    }
+    console.error(e);
   }
 
   // stop local video
@@ -250,7 +290,7 @@
       console.log('Creating remote session description...' );
      
       var remoteDescription = message.peerDescription; 
-      var RTCSessionDescription = window.mozRTCSessionDescription || window.webkitRTCSessionDescription || window.RTCSessionDescription;
+      var RTCSessionDescription = window.RTCSessionDescription || window.webkitRTCSessionDescription || window.RTCSessionDescription;
       pc.setRemoteDescription(new RTCSessionDescription(remoteDescription), function() {
         console.log('Sending answer...');
         pc.createAnswer(setLocalDescAndSendMessageAnswer, onCreateAnswerFailed, offerAnswerConstraints);
@@ -262,12 +302,12 @@
       console.log('Received answer...');
       console.log('Setting remote session description...' );
       var remoteDescription = message.peerDescription;
-      var RTCSessionDescription = window.mozRTCSessionDescription || window.webkitRTCSessionDescription || window.RTCSessionDescription;
+      var RTCSessionDescription = window.RTCSessionDescription || window.webkitRTCSessionDescription || window.RTCSessionDescription;
       pc.setRemoteDescription(new RTCSessionDescription(remoteDescription));
 
     } else if (message.messageType === 'iceCandidate' && mediaFlowing) {
       console.log('Received ICE candidate...');
-      var RTCIceCandidate = window.mozRTCIceCandidate || window.webkitRTCIceCandidate || window.RTCIceCandidate;
+      var RTCIceCandidate = window.RTCIceCandidate || window.webkitRTCIceCandidate || window.RTCIceCandidate;
       var candidate = new RTCIceCandidate({sdpMLineIndex:message.candidate.sdpMLineIndex, sdpMid:message.candidate.sdpMid, candidate:message.candidate.candidate});
       console.log(candidate);
       pc.addIceCandidate(candidate);
@@ -280,7 +320,7 @@
 
   function createPeerConnection() {
     console.log("Creating peer connection");
-    RTCPeerConnection = window.webkitRTCPeerConnection || window.mozRTCPeerConnection;
+    RTCPeerConnection = window.webkitRTCPeerConnection || window.RTCPeerConnection;
     var pc_config = {"iceServers":[]};
     try {
       pc = new RTCPeerConnection(pc_config);
