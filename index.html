@@ -168,9 +168,6 @@
       navigator.mediaDevices.getUserMedia = promisifiedOldGUM;
     }
 
-    // Prefer camera resolution nearest to 1280x720.
-    //var constraints = { audio: true, video: { width: 1280, height: 720 } };
-
     navigator.mediaDevices.getUserMedia(screen_constraints)
       .then(function(stream) {
         localStream = stream;
@@ -199,7 +196,7 @@
 
   function onerror(e) {
     if (location.protocol === 'http:') {
-        alert('Please test this WebRTC experiment on HTTPS.');
+        alert('Please test using HTTPS.');
     } else {
         alert('Screen capturing is either denied or not supported. Have you enabled the appropriate flag? see README.md');
     }
