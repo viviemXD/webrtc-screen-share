@@ -205,13 +205,8 @@
 
   // stop local video
   function stopMedia() {
-    if (localvid.mozSrcObject) {
-      localvid.mozSrcObject.stop();
-      localvid.src = null;
-    } else {
-      localvid.src = ""; 
-      localStream.stop();
-    }   
+    localvid.src = "";
+    localStream.getVideoTracks()[0].stop();
   }
 
   // send SDP over web socket 
@@ -223,7 +218,6 @@
                     "messageType": "offer",
                     "peerDescription": sessionDescription
                }));
-
   }
 
   // send SDP over web socket 
@@ -269,8 +263,8 @@
     mediaFlowing = false;    
   }
 
-  function onCreateAnswerFailed() {
-    console.log("Create Answer failed");
+  function onCreateAnswerFailed(error) {
+    console.log("Create Answer failed: ", error);
   }
 
  socket.addEventListener("message", onWebSocketMessage, false);
@@ -290,7 +284,7 @@
       var RTCSessionDescription = window.RTCSessionDescription || window.webkitRTCSessionDescription || window.RTCSessionDescription;
       pc.setRemoteDescription(new RTCSessionDescription(remoteDescription), function() {
         console.log('Sending answer...');
-        pc.createAnswer(setLocalDescAndSendMessageAnswer, onCreateAnswerFailed, offerAnswerConstraints);
+        pc.createAnswer(setLocalDescAndSendMessageAnswer, onCreateAnswerFailed);
       }, function() {  
         console.log('Error setting remote description');   
       });
@@ -349,7 +343,6 @@
     function onRemoteStreamAdded(event) {
       console.log("Added remote stream");
       remotevid.src = window.URL.createObjectURL(event.stream);
-      pc.createAnswer(setLocalDescAndSendMessageAnswer, onCreateAnswerFailed, offerAnswerConstraints);
     }
 
     // when remote removes a stream, remove it from the local video element
