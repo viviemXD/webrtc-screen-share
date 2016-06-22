@@ -41,7 +41,7 @@
 </head>
 <body>
 
-  <h1>Screen share using WebRTC and node.js + web socket for transport</h1>  
+  <h1>Screen share using WebRTC</h1>  
   <h2>Use Chrome or Firefox, connect two browsers. <br> Firefox allows screen and window share, Chrome only alows screen share when not an extension.</h2>
   <div class="left-section">
   <h3>Local Screen</h3>
@@ -77,6 +77,7 @@
   var localStream = null;
   var pc = null;
   var mediaFlowing = false;
+  var useH264 = true;
 
   // Detect browser
   var userAgent = navigator.userAgent.toLowerCase();
@@ -209,8 +210,24 @@
     localStream.getVideoTracks()[0].stop();
   }
 
+  function useH264Codec(sdp) {
+    var isFirefox = typeof InstallTrigger !== 'undefined';
+    if (isFirefox)
+        updated_sdp = sdp.replace("m=video 9 UDP/TLS/RTP/SAVPF 120 126 97\r\n","m=video 9 UDP/TLS/RTP/SAVPF 126 120 97\r\n");
+    else
+        updated_sdp = sdp.replace("m=video 9 UDP/TLS/RTP/SAVPF 100 101 107 116 117 96 97 99 98\r\n","m=video 9 UDP/TLS/RTP/SAVPF 107 101 100 116 117 96 97 99 98\r\n");
+
+    return updated_sdp;
+  }
+
   // send SDP over web socket 
   function setLocalDescAndSendMessageOffer(sessionDescription) {
+
+    if (useH264) {
+      // use H264 video codec in offer every time
+      sessionDescription.sdp = useH264Codec(sessionDescription.sdp);
+    }
+
     pc.setLocalDescription(sessionDescription);
     console.log("Sending: SDP");
     console.log(sessionDescription);
@@ -222,6 +239,12 @@
 
   // send SDP over web socket 
   function setLocalDescAndSendMessageAnswer(sessionDescription) {
+
+    if (useH264) {
+      // use H264 video codec in offer every time
+      sessionDescription.sdp = useH264Codec(sessionDescription.sdp);
+    }
+
     pc.setLocalDescription(sessionDescription);
     console.log("Sending: SDP");
     console.log(sessionDescription);
