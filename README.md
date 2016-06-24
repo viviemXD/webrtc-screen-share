@@ -37,7 +37,7 @@ Test page for screen share feature, using WebRTC and node.js web socket transpor
   }
 
   function startMedia() {
-    navigator.getUserMedia(constraints, onstream, onerror);
+    navigator.mediaDevices.getUserMedia(constraints, onstream, onerror);
   }
 
 ```
@@ -50,12 +50,10 @@ Test page for screen share feature, using WebRTC and node.js web socket transpor
 ####  Server Steps (Works on Linux and MacOS so far)
 
 - Clone this repo to your machine, does which not need to be to a web server.
-
 - Generate keys unless you have real ones, run these commands in the same folder as app.js.
   -  openssl genrsa -out webrtcwwsocket-key.pem 1024
   -  openssl req -new -key webrtcwwsocket-key.pem -out webrtcwwsocket-csr.pem
   -  openssl x509 -req -in webrtcwwsocket-csr.pem -signkey webrtcwwsocket-key.pem -out webrtcwwsocket-cert.pem
-  
 - Run  'sudo node app.js'
 - You may get errors, if you do then reinstall WebSocket in that folder, e.g. 'sudo npm install websocket'
 
