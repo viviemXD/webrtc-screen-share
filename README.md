@@ -16,7 +16,7 @@ Test page for screen share feature, using WebRTC and node.js web socket transpor
 
 ```javascript
 
-  if(isChrome) {   
+  if (isChrome) {   
     constraints = { 
       video: {
         mandatory: {
@@ -70,8 +70,8 @@ Test page for screen share feature, using WebRTC and node.js web socket transpor
 - Start media and share.
 
 
-NOTE: Google intend on using chrome extensions for desktop share for security reasons.  The way of doing share using Chrome in this demo is for testing purposes only, that is why it is behind a flag.
+NOTE: Google intend on using Chrome extensions for desktop share for security reasons.  The way of doing share using Chrome in this demo is for testing purposes only, that is why it is behind a flag.
 See this demo of share in an extension: 
 https://github.com/emannion/webrtc-application-screen-share
 
-NOTE: Firefox also recommends using an extension for screenshare, two advantages being not requiring the two config items mentioned in the client steps above.
+NOTE: Firefox also recommends using an extension for screenshare, the advantage being not requiring the two config items mentioned in the client steps above.
