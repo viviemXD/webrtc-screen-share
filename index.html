@@ -42,7 +42,7 @@
 <body>
 
   <h1>Screen share using WebRTC</h1>  
-  <h2>Use Chrome or Firefox, connect two browsers. <br> Firefox allows screen and window share, Chrome only alows screen share when not an extension.</h2>
+  <h2>Use Chrome or Firefox, connect two browsers. <br> Firefox allows screen, window and application share, Chrome only alows screen share when not an extension.</h2>
   <div class="left-section">
   <h3>Local Screen</h3>
   <video class="left-video" id="localvideo" autoplay controls></video>
@@ -52,6 +52,7 @@
       <select id="selector" onchange="selectChanged()" disabled>
         <option value="screen">Screen</option>
         <option value="window">Window</option>
+        <option value="application">Application</option>
       </select> 
     </div>
   </div>
@@ -128,11 +129,17 @@
           mediaSource: "window"
         }   
       };
-    } else { 
+    } else if (value == "screen") { 
       screen_constraints = { 
         video: {
           mediaSource: "screen"
         }   
+      };
+    } else if (value == "application") {
+      screen_constraints = {
+        video: {
+          mediaSource: "application"
+        }
       };
     }
   }
